@@ -2,6 +2,7 @@
 # placeholder: 'placeholder'
 plugins:
   - 'ldap'
+  - 'git'
   - 'github'
   - 'translation'
   - 'preSCMbuildstep'

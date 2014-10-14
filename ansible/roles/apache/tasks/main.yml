@@ -1,0 +1,52 @@
+---
+- name: install apache packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: apache_packages
+
+- name: update apt cache
+  apt: update_cache=yes cache_valid_time=86400
+
+- name: test | apache installed
+  apt: "name={{ item }} state=installed"
+  with_items: apache_packages
+
+- name: update ports in apache conf file
+  lineinfile:
+    dest: "{{ apache_server_root }}/ports.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items: apache_ports_configuration_items
+  notify: restart apache
+
+- name: enable apache mods
+  file:
+    src: "{{ apache_server_root }}/mods-available/{{ item }}"
+    dest: "{{ apache_server_root }}/mods-enabled/{{ item }}"
+    state: link
+  with_items: apache_mods_enabled
+  notify: restart apache
+
+- name: add vhost
+  template:
+    src: "vhosts.conf.j2"
+    dest: "{{ apache_conf_path }}/sites-available/vhosts.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache
+  when: apache_create_vhosts
+
+- name: Add vhost symlink in sites-enabled.
+  file:
+    src: "{{ apache_conf_path }}/sites-available/vhosts.conf"
+    dest: "{{ apache_conf_path }}/sites-enabled/vhosts.conf"
+    state: link
+
+- name: test | apache is running
+  service:
+    name: "{{ apache_daemon }}"
+    state: started
+    enabled: yes

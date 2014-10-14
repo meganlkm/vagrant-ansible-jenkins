@@ -1,0 +1,9 @@
+---
+# Add Jenkins repository
+- include: jenkins.yml tags=jenkins
+  when: ansible_distribution in [ 'Debian', 'Ubuntu' ]
+
+# - name: test connection
+#   command: echo $HOME
+#   register: echo
+# - debug: var=echo.stdout_lines

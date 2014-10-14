@@ -1,0 +1,6 @@
+# jenkins setup
+[jenkins1]
+192.168.33.28
+
+[all:children]
+jenkins1

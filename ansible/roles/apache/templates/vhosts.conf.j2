@@ -1,0 +1,15 @@
+{% for vhost in apache_vhosts %}
+<VirtualHost *:80>
+  ServerAdmin {{ vhost.serveradmin }}
+  ServerName {{ vhost.servername }}
+  ServerAlias ci
+  ProxyRequests Off
+  <Proxy *>
+    Order deny,allow
+    Allow from all
+  </Proxy>
+  ProxyPreserveHost on
+  ProxyPass / http://{{ vhost.ip }}:8080/ nocanon
+  AllowEncodedSlashes NoDecode
+</VirtualHost>
+{% endfor %}
